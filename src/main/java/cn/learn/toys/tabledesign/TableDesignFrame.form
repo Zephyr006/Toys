@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.learn.toys.tabledesign.TableDesignFrame">
-  <grid id="27dc6" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="0" left="0" bottom="0" right="0"/>
+  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="973" height="765"/>
     </constraints>
@@ -10,10 +9,8 @@
     </properties>
     <border type="none"/>
     <children>
-      <grid id="1f2d1" binding="motherPanel" custom-create="true" layout-manager="GridBagLayout">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="true"/>
-        </constraints>
+      <grid id="1f2d1" binding="motherPanel" layout-manager="GridBagLayout">
+        <constraints border-constraint="First"/>
         <properties/>
         <border type="none"/>
         <children>
@@ -26,6 +23,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="列名"/>
             </properties>
           </component>
           <component id="a7160" class="javax.swing.JTextField" binding="commentField">
@@ -35,7 +33,9 @@
               </grid>
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="注释"/>
+            </properties>
           </component>
           <component id="49012" class="javax.swing.JComboBox" binding="dataTypeField">
             <constraints>
@@ -54,7 +54,7 @@
                 <item value="date"/>
                 <item value="datetime"/>
               </model>
-              <toolTipText value=""/>
+              <toolTipText value="数据类型"/>
             </properties>
           </component>
           <component id="b86c7" class="javax.swing.JRadioButton" binding="notNullField">
@@ -76,7 +76,7 @@
               <text value="自增"/>
             </properties>
           </component>
-          <component id="6579c" class="javax.swing.JComboBox" binding="opUpdateField" custom-create="true">
+          <component id="6579c" class="javax.swing.JComboBox" binding="opUpdateField">
             <constraints>
               <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="1.0"/>
@@ -100,19 +100,33 @@
                 <item value="0"/>
                 <item value="CURRENT_TIMESTAMP"/>
               </model>
-              <toolTipText value=""/>
+              <toolTipText value="默认值"/>
             </properties>
           </component>
         </children>
       </grid>
-      <component id="b40f3" class="javax.swing.JButton" binding="genCreateSql">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="生成建表语句"/>
-        </properties>
-      </component>
+      <grid id="78bb0" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="Last"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="87095" class="javax.swing.JButton" binding="addRowBtn">
+            <constraints/>
+            <properties>
+              <text value="增加一行"/>
+            </properties>
+          </component>
+          <vspacer id="a2f47">
+            <constraints/>
+          </vspacer>
+          <component id="b40f3" class="javax.swing.JButton" binding="genCreateSqlBtn">
+            <constraints/>
+            <properties>
+              <text value="生成建表语句"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

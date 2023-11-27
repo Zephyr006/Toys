@@ -12,6 +12,6 @@ public class Main {
         // 设置窗口的默认关闭操作
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.setSize(1000, 1000);
+        frame.setSize(1200, 900);
     }
 }

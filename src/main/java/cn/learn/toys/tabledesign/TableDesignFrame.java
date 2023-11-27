@@ -1,9 +1,15 @@
 package cn.learn.toys.tabledesign;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TableDesignFrame extends JFrame {
 
+    private List<JPanel> panelList = new ArrayList<>();
     private JPanel motherPanel;
     private JTextField columnNameField;
     private JTextField commentField;
@@ -12,12 +18,16 @@ public class TableDesignFrame extends JFrame {
     private JRadioButton notNullField;
     private JCheckBox autoIncField;
     private JComboBox opUpdateField;
-    private JButton genCreateSql;
+    private JButton genCreateSqlBtn;
+    private JPanel mainPanel;
+    private JButton addRowBtn;
 
     public TableDesignFrame(String title) {
         super(title);
+        //add(genCreateSqlBtn);
+        //add(motherPanel);
+        setContentPane(mainPanel);
 
-        //setContentPane(motherPanel);
     }
 
     private void createUIComponents() {
@@ -31,5 +41,14 @@ public class TableDesignFrame extends JFrame {
         //motherPanel.add(notNullField);
         //motherPanel.add(autoIncField);
         //motherPanel.add(opUpdateField);
+    }
+
+    private void bindActionListener() {
+        addRowBtn.addActionListener(event -> {
+            JPanel newPanel = new JPanel();
+            for (Component componentInPanel : motherPanel.getComponents()) {
+                //componentInPanel.clone();
+            }
+        });
     }
 }
