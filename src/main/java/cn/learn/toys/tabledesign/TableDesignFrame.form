@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.learn.toys.tabledesign.TableDesignFrame">
+  <grid id="27dc6" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="973" height="765"/>
+    </constraints>
+    <properties>
+      <enabled value="true"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="1f2d1" binding="motherPanel" custom-create="true" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="true"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="28a6" class="javax.swing.JTextField" binding="columnNameField">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="a7160" class="javax.swing.JTextField" binding="commentField">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="49012" class="javax.swing.JComboBox" binding="dataTypeField">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <editable value="true"/>
+              <model>
+                <item value="tinyint"/>
+                <item value="smallint"/>
+                <item value="int"/>
+                <item value="bigint"/>
+                <item value="char"/>
+                <item value="varchar"/>
+                <item value="date"/>
+                <item value="datetime"/>
+              </model>
+              <toolTipText value=""/>
+            </properties>
+          </component>
+          <component id="b86c7" class="javax.swing.JRadioButton" binding="notNullField">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <text value="非空"/>
+            </properties>
+          </component>
+          <component id="72bf9" class="javax.swing.JCheckBox" binding="autoIncField">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value="自增"/>
+            </properties>
+          </component>
+          <component id="6579c" class="javax.swing.JComboBox" binding="opUpdateField" custom-create="true">
+            <constraints>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+              <model/>
+              <toolTipText value=""/>
+            </properties>
+          </component>
+          <component id="368b9" class="javax.swing.JComboBox" binding="defaultField">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <editable value="true"/>
+              <model>
+                <item value=""/>
+                <item value="''"/>
+                <item value="0"/>
+                <item value="CURRENT_TIMESTAMP"/>
+              </model>
+              <toolTipText value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <component id="b40f3" class="javax.swing.JButton" binding="genCreateSql">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="生成建表语句"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
