@@ -1,119 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.learn.toys.tabledesign.TableDesignFrame">
-  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+  <grid id="27dc6" binding="root" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="973" height="765"/>
+      <xy x="20" y="20" width="838" height="737"/>
     </constraints>
     <properties>
       <enabled value="true"/>
     </properties>
     <border type="none"/>
     <children>
-      <grid id="1f2d1" binding="motherPanel" layout-manager="GridBagLayout">
-        <constraints border-constraint="First"/>
+      <grid id="78bb0" binding="bottom" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="South"/>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="28a6" class="javax.swing.JTextField" binding="columnNameField">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <text value=""/>
-              <toolTipText value="列名"/>
-            </properties>
-          </component>
-          <component id="a7160" class="javax.swing.JTextField" binding="commentField">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <toolTipText value="注释"/>
-            </properties>
-          </component>
-          <component id="49012" class="javax.swing.JComboBox" binding="dataTypeField">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <editable value="true"/>
-              <model>
-                <item value="tinyint"/>
-                <item value="smallint"/>
-                <item value="int"/>
-                <item value="bigint"/>
-                <item value="char"/>
-                <item value="varchar"/>
-                <item value="date"/>
-                <item value="datetime"/>
-              </model>
-              <toolTipText value="数据类型"/>
-            </properties>
-          </component>
-          <component id="b86c7" class="javax.swing.JRadioButton" binding="notNullField">
-            <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <enabled value="true"/>
-              <text value="非空"/>
-            </properties>
-          </component>
-          <component id="72bf9" class="javax.swing.JCheckBox" binding="autoIncField">
-            <constraints>
-              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <text value="自增"/>
-            </properties>
-          </component>
-          <component id="6579c" class="javax.swing.JComboBox" binding="opUpdateField">
-            <constraints>
-              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <editable value="false"/>
-              <model/>
-              <toolTipText value=""/>
-            </properties>
-          </component>
-          <component id="368b9" class="javax.swing.JComboBox" binding="defaultField">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties>
-              <editable value="true"/>
-              <model>
-                <item value=""/>
-                <item value="''"/>
-                <item value="0"/>
-                <item value="CURRENT_TIMESTAMP"/>
-              </model>
-              <toolTipText value="默认值"/>
-            </properties>
-          </component>
-        </children>
-      </grid>
-      <grid id="78bb0" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
-        <constraints border-constraint="Last"/>
-        <properties/>
-        <border type="none"/>
-        <children>
-          <component id="87095" class="javax.swing.JButton" binding="addRowBtn">
+          <component id="87095" class="javax.swing.JButton" binding="genBtn">
             <constraints/>
             <properties>
-              <text value="增加一行"/>
+              <text value="生成"/>
             </properties>
           </component>
           <vspacer id="a2f47">
@@ -127,6 +31,67 @@
           </component>
         </children>
       </grid>
+      <grid id="4a343" binding="rightPanel" layout-manager="GridBagLayout">
+        <constraints border-constraint="East"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="114ab" class="javax.swing.JButton" binding="delRowBtn">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value="删除"/>
+              <verticalAlignment value="0"/>
+            </properties>
+          </component>
+          <component id="727a8" class="javax.swing.JButton" binding="addRowBtn">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value="插入"/>
+            </properties>
+          </component>
+          <component id="fbf44" class="javax.swing.JButton" binding="moveUpBtn">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="上移"/>
+            </properties>
+          </component>
+          <component id="afc59" class="javax.swing.JButton" binding="moveDownBtn">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="下移"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <scrollpane id="95bc6" binding="center">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="dd4d1" class="javax.swing.JTable" binding="table">
+            <constraints/>
+            <properties>
+              <showHorizontalLines value="true"/>
+              <showVerticalLines value="false"/>
+            </properties>
+            <clientProperties>
+              <terminateEditOnFocusLost class="java.lang.Boolean" value="true"/>
+            </clientProperties>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>

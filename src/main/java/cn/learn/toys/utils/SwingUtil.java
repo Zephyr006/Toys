@@ -1,9 +1,27 @@
 package cn.learn.toys.utils;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 
-public class ComponentUtil {
+public class SwingUtil {
+
+    public static JDialog createLabelDialog(String title, String text) {
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);
+        Label label = new Label(text);
+        label.setFont(new Font("宋体", Font.PLAIN, 18));
+        dialog.add(label);
+        dialog.setSize(text.getBytes().length * 16, 500);
+        dialog.setLocationRelativeTo(null);
+        return dialog;
+    }
+
+    public static JTextField getCellTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("宋体", Font.PLAIN, 18));
+        textField.setEditable(true);
+        return textField;
+    }
 
 
     public static void deepCopy(Component originalComponent, Component copyComponent) {
