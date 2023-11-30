@@ -8,9 +8,10 @@ import java.util.function.Function;
 
 /**
  * 枚举的顺序决定列出现的顺序，sort 决定对应列在 sql 语句中出现的顺序
+ * 全局的 sql 关键词都用小写
  */
-public enum TableColumn {
-    NAME("列名", Object.class, null, String::valueOf, 20, 0),
+public enum ColumnEnum {
+    NAME("列名", Object.class, null, o -> "`" + o + "`", 20, 0),
 
     COMMENT("注释", Object.class, null, o -> "comment '" + o + "'", 30, 6),
 
@@ -20,11 +21,11 @@ public enum TableColumn {
     NOT_NULL("非空", Boolean.class,null,
             obj -> Boolean.TRUE.equals(obj) ? "not null": "",8, 2),
 
-    DEFAULT_VAL("默认值", List.class, Arrays.asList("''", "null", "0", "current_timestamp"),
-            obj -> "default " + obj, 12, 3),
+    DEFAULT_VAL("默认值", List.class, Arrays.asList("", "''", "null", "0", "current_timestamp"),
+            obj -> StringUtil.isEmpty(obj.toString()) ? "" : "default " + obj, 12, 3),
 
-    PRIMARY_KEY("自增", Boolean.class,null,
-            obj -> Boolean.TRUE.equals(obj) ? "auto_increment" : "",8, 4),
+    PRIMARY_KEY("主键", Boolean.class,null,
+            obj -> Boolean.TRUE.equals(obj) ? "auto_increment primary key" : "",8, 4),
 
     ON_UPDATE("On Update", List.class, Arrays.asList("","current_timestamp"),
             obj -> StringUtil.isEmpty(obj.toString()) ? "" : "on update " + obj, 12, 5),
@@ -37,8 +38,8 @@ public enum TableColumn {
     private int widthPercent;
     private int sqlSort;
 
-    TableColumn(String name, Class<?> columnClass, List<String> options,
-                Function<Object, String> convertor, int widthPercent, int sort) {
+    ColumnEnum(String name, Class<?> columnClass, List<String> options,
+               Function<Object, String> convertor, int widthPercent, int sort) {
         this.name = name;
         //this.defaultVal = defaultVal;
         this.columnClass = columnClass;

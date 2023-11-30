@@ -1,6 +1,7 @@
 package cn.learn.toys.tabledesign;
 
 import cn.learn.toys.Main;
+import cn.learn.toys.utils.SqlUtil;
 import cn.learn.toys.utils.StringUtil;
 import cn.learn.toys.utils.SwingUtil;
 
@@ -54,12 +55,12 @@ public class TableDesignFrame extends JFrame {
 
     private void initTable() {
         tableModel = new DefaultTableModel(new Object[][]{},
-                Arrays.stream(TableColumn.values()).map(TableColumn::getName).toList().toArray());
+                Arrays.stream(ColumnEnum.values()).map(ColumnEnum::getName).toList().toArray());
         table.setModel(tableModel);
 
         //根据定义的列格式初始化 JTable
-        for (int idx = 0; idx < TableColumn.values().length; idx++) {
-            TableColumn col = TableColumn.values()[idx];
+        for (int idx = 0; idx < ColumnEnum.values().length; idx++) {
+            ColumnEnum col = ColumnEnum.values()[idx];
             if (List.class.equals(col.getColumnClass())) {
                 JComboBox<String> comboBox = new JComboBox<>(new Vector<>(col.getOptions()));
                 comboBox.setEditable(true);
@@ -73,10 +74,11 @@ public class TableDesignFrame extends JFrame {
     }
 
     private void bindActionListener() {
+        //增加一行按钮
         addRowBtn.addActionListener(event -> {
-            tableModel.addRow(Arrays.stream(TableColumn.values())
+            tableModel.addRow(Arrays.stream(ColumnEnum.values())
                     .map(col -> col.getColumnClass() == Boolean.class
-                            ? TableColumn.NOT_NULL.equals(col) : "").toArray());
+                            ? ColumnEnum.NOT_NULL.equals(col) : "").toArray());
             // 选中最后一行，并且使第一个单元格处于可编辑状态
             System.out.println("Now row count: " + table.getRowCount());
             table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
@@ -84,25 +86,54 @@ public class TableDesignFrame extends JFrame {
             //table.setCellEditor(new DefaultCellEditor(SwingUtil.getCellTextField()));
         });
 
+        //生成 sql 按钮
         genCreateSqlBtn.addActionListener(event -> {
             List<String> rowSqlList = new ArrayList<>(table.getRowCount());
             for (int row = 0; row < table.getRowCount(); row++) {
-                int colCount = TableColumn.values().length;
+                int colCount = ColumnEnum.values().length;
                 List<String> keywords = new ArrayList<>(colCount);
                 IntStream.range(0, colCount).forEach(i -> keywords.add(""));
                 // 从 table 列中取数据
                 for (int colIdx = 0; colIdx < colCount; colIdx++) {
-                    TableColumn col = TableColumn.values()[colIdx];
+                    ColumnEnum col = ColumnEnum.values()[colIdx];
                     keywords.add(col.getSqlSort(), col.getConvertor().apply(table.getValueAt(row, colIdx)));
                 }
                 keywords.removeIf(StringUtil::isEmpty);
                 String oneRowSql = String.join(" ", keywords);
-                rowSqlList.add(oneRowSql + ",");
+                rowSqlList.add("    " + oneRowSql + ",");
             }
-            JDialog dialog = SwingUtil.createLabelDialog("SQL已复制到剪切板",
-                    String.join("\n", rowSqlList));
+
+            JDialog dialog = SwingUtil.createLabelDialog("SQL已复制到剪切板", SqlUtil.formatToCreateTableSql(rowSqlList));
             dialog.setVisible(true);
         });
+
+        // 编辑表格时，进行数据联动
+        table.addPropertyChangeListener("tableCellEditor", event -> {
+            int column = table.getEditingColumn();
+            int row = table.getEditingRow();
+
+            // 如果选中了"主键"，自动填充整列
+            if (ColumnEnum.PRIMARY_KEY.ordinal() == column && Boolean.TRUE.equals(tableModel.getValueAt(row, column))) {
+                tableModel.setValueAt("id", row, ColumnEnum.NAME.ordinal());
+                tableModel.setValueAt("自增主键", row, ColumnEnum.COMMENT.ordinal());
+                tableModel.setValueAt("int", row, ColumnEnum.DATA_TYPE.ordinal());
+            }
+            // 如果 On Update 选中了"current_timestamp"，自动填充
+            String currTimeKeyword = ColumnEnum.ON_UPDATE.getOptions().get(1);
+            if (ColumnEnum.ON_UPDATE.ordinal() == column && currTimeKeyword.equals(tableModel.getValueAt(row, column))) {
+                tableModel.setValueAt("update_time", row, ColumnEnum.NAME.ordinal());
+                tableModel.setValueAt("更新时间", row, ColumnEnum.COMMENT.ordinal());
+                tableModel.setValueAt("datetime", row, ColumnEnum.DATA_TYPE.ordinal());
+                tableModel.setValueAt(currTimeKeyword, row, ColumnEnum.DEFAULT_VAL.ordinal());
+            }
+            // 如果注释以"是否"开头，自动填充数据格式和默认值
+            if (ColumnEnum.COMMENT.ordinal() == column
+                    && String.valueOf(tableModel.getValueAt(row, column)).startsWith("是否")) {
+                tableModel.setValueAt("tinyint(1)", row, ColumnEnum.DATA_TYPE.ordinal());
+                tableModel.setValueAt("0", row, ColumnEnum.DEFAULT_VAL.ordinal());
+            }
+        });
+
     }
 
     private void adjustStyle() {
@@ -114,7 +145,7 @@ public class TableDesignFrame extends JFrame {
         setLocationRelativeTo(null);
 
 
-        table.setFont(new Font("微软雅黑", Font.PLAIN, 18));
+        table.setFont(new Font("微软雅黑", Font.PLAIN, 16));
         table.setForeground(Color.darkGray);
         table.setRowHeight(36);
         table.getTableHeader().setFont(new Font("宋体", Font.BOLD, 18));
@@ -125,8 +156,8 @@ public class TableDesignFrame extends JFrame {
         // 被选中行背景色
         table.setSelectionBackground(new Color(115, 210, 250));
         // 根据配置的宽度比例设置每一列的宽度
-        for (int idx = 0; idx < TableColumn.values().length; idx++) {
-            TableColumn col = TableColumn.values()[idx];
+        for (int idx = 0; idx < ColumnEnum.values().length; idx++) {
+            ColumnEnum col = ColumnEnum.values()[idx];
             table.getColumnModel().getColumn(idx).setPreferredWidth(windowWidth * col.getWidthPercent() / 100);
         }
     }

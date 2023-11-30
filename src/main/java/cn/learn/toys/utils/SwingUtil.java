@@ -2,16 +2,29 @@ package cn.learn.toys.utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SwingUtil {
 
     public static JDialog createLabelDialog(String title, String text) {
         JDialog dialog = new JDialog();
         dialog.setTitle(title);
-        Label label = new Label(text);
-        label.setFont(new Font("宋体", Font.PLAIN, 18));
-        dialog.add(label);
-        dialog.setSize(text.getBytes().length * 16, 500);
+
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/plain");
+        //textPane.setContentType("text/html");
+        textPane.setText(text);
+        textPane.setFont(new Font("宋体", Font.PLAIN, 16));
+        dialog.add(textPane);
+
+        AtomicInteger oneRowMaxLen = new AtomicInteger();
+        AtomicInteger rowsCount = new AtomicInteger();
+        text.lines().forEach(line -> {
+            oneRowMaxLen.set(Math.max(oneRowMaxLen.get(), line.length()));
+            rowsCount.addAndGet(1);
+        });
+        dialog.setSize(oneRowMaxLen.get() * 10, rowsCount.get() * 32);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLocationRelativeTo(null);
         return dialog;
     }
