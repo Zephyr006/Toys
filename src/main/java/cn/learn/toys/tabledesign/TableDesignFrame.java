@@ -8,13 +8,15 @@ import cn.learn.toys.utils.SwingUtil;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.IntStream;
 
-public class TableDesignFrame extends JFrame {
+public class TableDesignFrame extends JFrame implements KeyListener{
 
     //private static final LinkedHashMap<String, TableCellEditor> headerToCellMap = new LinkedHashMap<>() {{
     //    put("列名", new DefaultCellEditor(new JTextField()));
@@ -49,7 +51,8 @@ public class TableDesignFrame extends JFrame {
         bindActionListener();
         // 直接新增一行
         addRowBtn.doClick();
-        //this.pack();
+
+        setVisible(true);
     }
 
 
@@ -96,7 +99,7 @@ public class TableDesignFrame extends JFrame {
                 // 从 table 列中取数据
                 for (int colIdx = 0; colIdx < colCount; colIdx++) {
                     ColumnEnum col = ColumnEnum.values()[colIdx];
-                    keywords.add(col.getSqlSort(), col.getConvertor().apply(table.getValueAt(row, colIdx)));
+                    keywords.add(col.getSqlSort(), col.getSqlConvertor().apply(table.getValueAt(row, colIdx)));
                 }
                 keywords.removeIf(StringUtil::isEmpty);
                 String oneRowSql = String.join(" ", keywords);
@@ -113,27 +116,36 @@ public class TableDesignFrame extends JFrame {
             int row = table.getEditingRow();
 
             // 如果选中了"主键"，自动填充整列
-            if (ColumnEnum.PRIMARY_KEY.ordinal() == column && Boolean.TRUE.equals(tableModel.getValueAt(row, column))) {
+            Object tableValueAt = tableModel.getValueAt(row, column);
+            if (ColumnEnum.PRIMARY_KEY.ordinal() == column && Boolean.TRUE.equals(tableValueAt)) {
                 tableModel.setValueAt("id", row, ColumnEnum.NAME.ordinal());
                 tableModel.setValueAt("自增主键", row, ColumnEnum.COMMENT.ordinal());
                 tableModel.setValueAt("int", row, ColumnEnum.DATA_TYPE.ordinal());
             }
             // 如果 On Update 选中了"current_timestamp"，自动填充
             String currTimeKeyword = ColumnEnum.ON_UPDATE.getOptions().get(1);
-            if (ColumnEnum.ON_UPDATE.ordinal() == column && currTimeKeyword.equals(tableModel.getValueAt(row, column))) {
+            if (ColumnEnum.ON_UPDATE.ordinal() == column && currTimeKeyword.equals(tableValueAt)) {
                 tableModel.setValueAt("update_time", row, ColumnEnum.NAME.ordinal());
                 tableModel.setValueAt("更新时间", row, ColumnEnum.COMMENT.ordinal());
                 tableModel.setValueAt("datetime", row, ColumnEnum.DATA_TYPE.ordinal());
                 tableModel.setValueAt(currTimeKeyword, row, ColumnEnum.DEFAULT_VAL.ordinal());
             }
             // 如果注释以"是否"开头，自动填充数据格式和默认值
-            if (ColumnEnum.COMMENT.ordinal() == column
-                    && String.valueOf(tableModel.getValueAt(row, column)).startsWith("是否")) {
+            if (ColumnEnum.COMMENT.ordinal() == column && String.valueOf(tableValueAt).startsWith("是否")) {
                 tableModel.setValueAt("tinyint(1)", row, ColumnEnum.DATA_TYPE.ordinal());
                 tableModel.setValueAt("0", row, ColumnEnum.DEFAULT_VAL.ordinal());
             }
+            if (ColumnEnum.COMMENT.ordinal() == column && String.valueOf(tableValueAt).toUpperCase().endsWith("ID")) {
+                tableModel.setValueAt("int unsigned", row, ColumnEnum.DATA_TYPE.ordinal());
+            }
+            if (ColumnEnum.NOT_NULL.ordinal() == column && Boolean.FALSE.equals(tableValueAt)) {
+                tableModel.setValueAt("", row, ColumnEnum.DEFAULT_VAL.ordinal());
+            }
         });
 
+        // mac: 增加一行按钮的快捷键
+        root.registerKeyboardAction(e -> addRowBtn.doClick(),
+                KeyStroke.getKeyStroke("meta " + (char) KeyEvent.VK_N), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     private void adjustStyle() {
@@ -166,4 +178,18 @@ public class TableDesignFrame extends JFrame {
         // TODO: place custom component creation code here
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println(e);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        System.out.println(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        System.out.println(e);
+    }
 }
