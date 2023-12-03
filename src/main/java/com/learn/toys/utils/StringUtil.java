@@ -1,4 +1,4 @@
-package cn.learn.toys.utils;
+package com.learn.toys.utils;
 
 public class StringUtil {
 

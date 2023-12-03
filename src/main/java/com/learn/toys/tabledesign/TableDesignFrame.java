@@ -1,15 +1,20 @@
-package cn.learn.toys.tabledesign;
+package com.learn.toys.tabledesign;
 
-import cn.learn.toys.Main;
-import cn.learn.toys.utils.SqlUtil;
-import cn.learn.toys.utils.StringUtil;
-import cn.learn.toys.utils.SwingUtil;
+import com.learn.toys.Main;
+import com.learn.toys.utils.SqlUtil;
+import com.learn.toys.utils.StringUtil;
+import com.learn.toys.utils.SwingUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.ImageProducer;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,16 +54,38 @@ public class TableDesignFrame extends JFrame implements KeyListener{
         initTable();
         adjustStyle();
         bindActionListener();
+        bindHotKey();
+
+        // 设置为单选模式，以便只修改选中单元格的样式
+        // table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         // 直接新增一行
         addRowBtn.doClick();
 
         setVisible(true);
     }
 
+    private void bindHotKey() {
+        // 生成sql的快捷键  meta+Enter
+        root.registerKeyboardAction(e -> genCreateSqlBtn.doClick(),
+                KeyStroke.getKeyStroke("meta ENTER"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // mac: 增加一行按钮的快捷键  meta+N
+        root.registerKeyboardAction(e -> addRowBtn.doClick(),
+                KeyStroke.getKeyStroke("meta " + (char) KeyEvent.VK_N), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // 删除一行按钮的快捷键  delete
+        root.registerKeyboardAction(e -> delRowBtn.doClick(),
+                KeyStroke.getKeyStroke("DELETE"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // 向下移动选中行的快捷键 down
+        root.registerKeyboardAction(e -> moveDownBtn.doClick(),
+                KeyStroke.getKeyStroke("DOWN"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // 向上移动选中行的快捷键 up
+        root.registerKeyboardAction(e -> moveUpBtn.doClick(),
+                KeyStroke.getKeyStroke("UP"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+    }
+
 
     private void initTable() {
         tableModel = new DefaultTableModel(new Object[][]{},
-                Arrays.stream(ColumnEnum.values()).map(ColumnEnum::getName).toList().toArray());
+                Arrays.stream(ColumnEnum.values()).map(ColumnEnum::getName).toArray());
         table.setModel(tableModel);
 
         //根据定义的列格式初始化 JTable
@@ -77,18 +104,6 @@ public class TableDesignFrame extends JFrame implements KeyListener{
     }
 
     private void bindActionListener() {
-        //增加一行按钮
-        addRowBtn.addActionListener(event -> {
-            tableModel.addRow(Arrays.stream(ColumnEnum.values())
-                    .map(col -> col.getColumnClass() == Boolean.class
-                            ? ColumnEnum.NOT_NULL.equals(col) : "").toArray());
-            // 选中最后一行，并且使第一个单元格处于可编辑状态
-            System.out.println("Now row count: " + table.getRowCount());
-            table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
-            table.editCellAt(table.getRowCount() - 1, 0);
-            //table.setCellEditor(new DefaultCellEditor(SwingUtil.getCellTextField()));
-        });
-
         //生成 sql 按钮
         genCreateSqlBtn.addActionListener(event -> {
             List<String> rowSqlList = new ArrayList<>(table.getRowCount());
@@ -106,7 +121,11 @@ public class TableDesignFrame extends JFrame implements KeyListener{
                 rowSqlList.add("    " + oneRowSql + ",");
             }
 
-            JDialog dialog = SwingUtil.createLabelDialog("SQL已复制到剪切板", SqlUtil.formatToCreateTableSql(rowSqlList));
+            String createTableSql = SqlUtil.formatToCreateTableSql(rowSqlList);
+            JDialog dialog = SwingUtil.createTextDialog("SQL已复制到剪切板", createTableSql);
+            // 获取系统剪切板,并将sql复制到剪切板
+            Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clip.setContents(new StringSelection(createTableSql), null);
             dialog.setVisible(true);
         });
 
@@ -114,6 +133,9 @@ public class TableDesignFrame extends JFrame implements KeyListener{
         table.addPropertyChangeListener("tableCellEditor", event -> {
             int column = table.getEditingColumn();
             int row = table.getEditingRow();
+            if (row < 0 || column < 0) {
+                return;
+            }
 
             // 如果选中了"主键"，自动填充整列
             Object tableValueAt = tableModel.getValueAt(row, column);
@@ -135,19 +157,61 @@ public class TableDesignFrame extends JFrame implements KeyListener{
                 tableModel.setValueAt("tinyint(1)", row, ColumnEnum.DATA_TYPE.ordinal());
                 tableModel.setValueAt("0", row, ColumnEnum.DEFAULT_VAL.ordinal());
             }
+            // 如果注释以"ID"结尾，自动填充数据格式
             if (ColumnEnum.COMMENT.ordinal() == column && String.valueOf(tableValueAt).toUpperCase().endsWith("ID")) {
                 tableModel.setValueAt("int unsigned", row, ColumnEnum.DATA_TYPE.ordinal());
             }
-            if (ColumnEnum.NOT_NULL.ordinal() == column && Boolean.FALSE.equals(tableValueAt)) {
-                tableModel.setValueAt("", row, ColumnEnum.DEFAULT_VAL.ordinal());
+            // 如果"非空"选中了"false"，自动填充默认值
+            if (ColumnEnum.NOT_NULL.ordinal() == column) {
+                if (Boolean.FALSE.equals(tableValueAt)) {
+                    tableModel.setValueAt("null", row, ColumnEnum.DEFAULT_VAL.ordinal());
+                } else {
+                    tableModel.setValueAt("", row, ColumnEnum.DEFAULT_VAL.ordinal());
+                }
             }
         });
 
-        // mac: 增加一行按钮的快捷键
-        root.registerKeyboardAction(e -> addRowBtn.doClick(),
-                KeyStroke.getKeyStroke("meta " + (char) KeyEvent.VK_N), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        //删除一行按钮
+        delRowBtn.addActionListener(event -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                tableModel.removeRow(table.getSelectedRow());
+                if (table.getRowCount() > 0) {
+                    table.setRowSelectionInterval(Math.max(0, selectedRow - 1), Math.max(0, selectedRow - 1));
+                }
+            }
+        });
+        //增加一行按钮
+        addRowBtn.addActionListener(event -> {
+            tableModel.addRow(Arrays.stream(ColumnEnum.values())
+                    .map(col -> col.getColumnClass() == Boolean.class
+                            ? ColumnEnum.NOT_NULL.equals(col) : "").toArray());
+            // 选中最后一行，并且使第一个单元格处于可编辑状态
+            System.out.println("Add row, now row count: " + table.getRowCount());
+            table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
+            table.editCellAt(table.getRowCount() - 1, 0);
+        });
+
+        // 向下移动一行按钮
+        moveDownBtn.addActionListener(event -> {
+            if (SwingUtil.moveRow(tableModel, table.getSelectedRow(), table.getRowCount(), 1)) {
+                table.setModel(tableModel);  // 刷新JTable
+            }
+        });
+        // 向上移动一行按钮
+        moveUpBtn.addActionListener(event -> {
+            if (SwingUtil.moveRow(tableModel, table.getSelectedRow(), table.getRowCount(), -1)) {
+                table.setModel(tableModel);  // 刷新JTable
+            }
+        });
     }
 
+    // public static void main(String[] args) throws IOException {
+    //     InputStream inputStream = TableDesignFrame.class.getResourceAsStream("/com/learn/toys/tabledesign/icons8-tool-96.ico");
+    //     Image image = new ImageIcon("/com/learn/toys/tabledesign/icons8-tool-96.ico").getImage();
+    //     ImageProducer source = image.getSource();
+    //     System.out.println(inputStream.available());
+    // }
     private void adjustStyle() {
         // 计算窗口大小，居中的 size 值
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -155,13 +219,14 @@ public class TableDesignFrame extends JFrame implements KeyListener{
         setSize(windowWidth, (int) (screenSize.getHeight() * Main.SIZE_PERCENTAGE / 100));
         // 居中显示
         setLocationRelativeTo(null);
+        setIconImage(new ImageIcon("icons8-tool-96.ico").getImage());
 
 
+        table.setRowHeight(32);
         table.setFont(new Font("微软雅黑", Font.PLAIN, 16));
         table.setForeground(Color.darkGray);
-        table.setRowHeight(36);
         table.getTableHeader().setFont(new Font("宋体", Font.BOLD, 18));
-        table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getWidth(), 42));
+        table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getWidth(), 36));
 
         // 表格边框
         table.setGridColor(Color.GRAY);
@@ -172,10 +237,6 @@ public class TableDesignFrame extends JFrame implements KeyListener{
             ColumnEnum col = ColumnEnum.values()[idx];
             table.getColumnModel().getColumn(idx).setPreferredWidth(windowWidth * col.getWidthPercent() / 100);
         }
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 
     @Override

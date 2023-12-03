@@ -1,12 +1,16 @@
-package cn.learn.toys.utils;
+package com.learn.toys.utils;
+
+import javafx.scene.layout.RowConstraints;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SwingUtil {
 
-    public static JDialog createLabelDialog(String title, String text) {
+    public static JDialog createTextDialog(String title, String text) {
         JDialog dialog = new JDialog();
         dialog.setTitle(title);
 
@@ -19,7 +23,7 @@ public class SwingUtil {
 
         AtomicInteger oneRowMaxLen = new AtomicInteger();
         AtomicInteger rowsCount = new AtomicInteger();
-        text.lines().forEach(line -> {
+        Arrays.stream(text.split("\n")).forEach(line -> {
             oneRowMaxLen.set(Math.max(oneRowMaxLen.get(), line.length()));
             rowsCount.addAndGet(1);
         });
@@ -27,6 +31,26 @@ public class SwingUtil {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLocationRelativeTo(null);
         return dialog;
+    }
+
+    /**
+     * 移动完数据之后需要调用 table.setModel(tableModel); 刷新table
+     */
+    public static boolean moveRow(DefaultTableModel tableModel, int selectedRow, int rowCount, int offset) {
+        // 如果是向下移动(offset>0),则被选中行不能是最后一行; 如果是向上移动(offset<0),被选中行不能是第一行
+        boolean canMove = (offset > 0) ? selectedRow < rowCount - 1 : selectedRow > 0;
+        if (canMove) {
+            // 获取需要移动的行 的数据
+            Object[] rowData = new Object[tableModel.getColumnCount()];
+            for (int i = 0; i < tableModel.getColumnCount(); i++) {
+                rowData[i] = tableModel.getValueAt(selectedRow, i);
+            }
+            // 从TableModel中删除该行
+            tableModel.removeRow(selectedRow);
+            // 在TableModel中的下一行插入该行
+            tableModel.insertRow(selectedRow + offset, rowData);
+        }
+        return canMove;
     }
 
     public static JTextField getCellTextField() {

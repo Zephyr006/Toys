@@ -1,7 +1,8 @@
-package cn.learn.toys.tabledesign;
+package com.learn.toys.tabledesign;
 
-import cn.learn.toys.utils.StringUtil;
+import com.learn.toys.utils.StringUtil;
 
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +17,7 @@ public enum ColumnEnum {
     COMMENT("注释", Object.class, null, o -> "comment '" + o + "'", 32, 6),
 
     DATA_TYPE("数据类型", List.class,
-            Arrays.asList("tinyint(1) unsigned", "tinyint(3) unsigned", "smallint(5) unsigned", "int unsigned",
+            Arrays.asList("tinyint(1)", "tinyint(3) unsigned", "smallint(5) unsigned", "int unsigned",
                     "bigint(13) unsigned", "varchar(31)", "varchar(255)", "char", "datetime", "decimal"),
             String::valueOf, 12, 1),
 
@@ -34,6 +35,7 @@ public enum ColumnEnum {
     ;
 
     private String name;
+    /** {@link javax.swing.JTable#createDefaultRenderers()} */
     private Class<?> columnClass;
     private List<String> options;
     private Function<Object, String> sqlConvertor;

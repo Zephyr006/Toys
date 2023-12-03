@@ -1,6 +1,6 @@
-package cn.learn.toys;
+package com.learn.toys;
 
-import cn.learn.toys.tabledesign.TableDesignFrame;
+import com.learn.toys.tabledesign.TableDesignFrame;
 
 import javax.swing.*;
 

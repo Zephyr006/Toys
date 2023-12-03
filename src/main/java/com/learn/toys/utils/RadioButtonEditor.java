@@ -1,4 +1,4 @@
-package cn.learn.toys.utils;
+package com.learn.toys.utils;
 
 import javax.swing.*;
 import java.awt.*;
